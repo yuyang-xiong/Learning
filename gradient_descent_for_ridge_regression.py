@@ -37,26 +37,14 @@ class GradientDescent:
             b = b - self.lr * d_b
             if epoch % 1000 == 0:
                 loss = loss_func.compute_loss(w, b)
-                print(f"Epoch {epoch:5d} | Loss = {loss:.4f}")
 
         return w, b
 
 if __name__ == "__main__":
     abalone = fetch_ucirepo(id=1)
-    print(type(abalone))
-    print(abalone)
 
     X_raw = abalone.data.features.values[:, 1:].astype(float)
-    print('X_raw')
-    print(type(X_raw))
-    print(X_raw.shape, X_raw.dtype)
-    print(X_raw)
-
     y_raw = abalone.data.targets.values.ravel()
-    print('y_raw')
-    print(type(y_raw))
-    print(y_raw.shape, y_raw.dtype)
-    print(y_raw)
 
     print("Dataset name:", abalone.metadata.name)
     print("Number of samples:", X_raw.shape[0])
