@@ -1,20 +1,21 @@
 import numpy as np
 from ucimlrepo import fetch_ucirepo
 
+
 class LinearRegression:
-    def __init__(self, X, y, lambda_ = 0.0):
-        self.X = X
-        self.y = y
-        self.n = y.shape[0]
-        self.d = X.shape[1]
-        self.lambda_ = lambda_
+    def __init__(self, X, y, lambda_=0.0):
+        self.X = X   # abalone features
+        self.y = y   # abalone age
+        self.n = y.shape[0]   # number of samples
+        self.d = X.shape[1]   # sample dimension
+        self.lambda_ = lambda_   # L2‑penalty coefficient
 
     def compute_loss(self, w, b):
         y_pred = self.X @ w + b
         mse = np.mean(np.square(y_pred - self.y))
         l2_penalty = self.lambda_ * np.sum(np.square(w))
-        total_loss = mse + l2_penalty
-        return total_loss
+        loss = mse + l2_penalty
+        return loss
 
     def compute_gradient(self, w, b):
         y_pred = self.X @ w + b
@@ -24,40 +25,38 @@ class LinearRegression:
 
 
 class GradientDescent:
-    def __init__(self, learning_rate=0.01, epochs=2000):
-        self.lr = learning_rate
-        self.epochs = epochs
+    def __init__(self, learning_rate=0.01, n_epochs=2000):
+        self.lr = learning_rate   # learning rate for gradient‑descent
+        self.n_epochs = n_epochs   # number of training iterations
 
     def optimize(self, loss_func):
         w = np.zeros(loss_func.d)
         b = 0.0
-        for epoch in range(self.epochs):
+        for epoch in range(self.n_epochs):
             d_w, d_b = loss_func.compute_gradient(w, b)
             w = w - self.lr * d_w
             b = b - self.lr * d_b
-            if epoch % 1000 == 0:
-                loss = loss_func.compute_loss(w, b)
 
         return w, b
+
 
 if __name__ == "__main__":
     abalone = fetch_ucirepo(id=1)
 
-    X_raw = abalone.data.features.values[:, 1:].astype(float)
-    y_raw = abalone.data.targets.values.ravel()
+    X_raw = abalone.data.features.values[:, 1:].astype(float)   # shape: (4177, 7)
+    y_raw = abalone.data.targets.values.ravel()   # shape: (4177,)
 
-    print("Dataset name:", abalone.metadata.name)
+    print("Dataset name:", abalone.metadata.name)   # Abalone
     print("Number of samples:", X_raw.shape[0])
     print("Number of features:", X_raw.shape[1])
 
     lambda_ = 0.05
     X = (X_raw - np.mean(X_raw, axis=0)) / np.std(X_raw, axis=0)
-    loss = LinearRegression(X, y_raw, lambda_ = lambda_)
-    optimizer = GradientDescent(learning_rate=0.01, epochs=5000)
+    loss = LinearRegression(X, y_raw, lambda_=lambda_)
+    optimizer = GradientDescent(learning_rate=0.01, n_epochs=5000)
     w, b = optimizer.optimize(loss)
 
     print("=== Training Finished ===")
     print("Optimal weight w:", w)
     print("Optimal bias b:", b)
-    final_loss = loss.compute_loss(w, b)
-    print("Final Loss:", final_loss)
+    print("Final Loss:", loss.compute_loss(w, b))
